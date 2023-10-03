@@ -21,11 +21,18 @@ file(GLOB_RECURSE QML_SOURCES
         CONFIGURE_DEPENDS
         qml/*.qml)
 
+file(GLOB_RECURSE QML_RESOURCES
+        RELATIVE ${PROJECT_SOURCE_DIR}
+        CONFIGURE_DEPENDS
+        res/*)
+
 file(GLOB_RECURSE SOURCES
         CONFIGURE_DEPENDS
         src/*.cpp
         src/*.hpp
 )
+
+include_directories(src/qml)
 
 qt_add_executable(seu_dip ${SOURCES})
 
@@ -33,6 +40,7 @@ qt_add_qml_module(seu_dip
         URI dip
         VERSION 1.0
         QML_FILES ${QML_SOURCES}
+        RESOURCES ${QML_RESOURCES}
         RESOURCE_PREFIX /
 )
 
