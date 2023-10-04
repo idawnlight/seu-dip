@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
     AppState::typeId = qmlTypeId("dip", 1, 0, "AppState");
     auto *appState = engine.singletonInstance<AppState *>(AppState::typeId);
 
-    appState->processor = new OpenCVProcessor();
+    appState->processor = processor;
 
     return QGuiApplication::exec();
 }

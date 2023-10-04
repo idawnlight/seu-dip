@@ -9,9 +9,9 @@ public:
     explicit OpenCVImageProvider(OpenCVProcessor *p) : QQuickImageProvider(QQuickImageProvider::Pixmap), processor(p) {}
 
     QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize) override {
-        if (id == "origin") {
+        if (id.startsWith("origin")) {
             return OpenCVProcessor::cvtMat2Pixmap(processor->getOriginImage());
-        } else if (id == "processed") {
+        } else if (id.startsWith("processed")) {
             return OpenCVProcessor::cvtMat2Pixmap(processor->getProcessedImage());
         } else {
             return {};

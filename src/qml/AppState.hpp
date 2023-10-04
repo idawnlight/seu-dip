@@ -3,25 +3,41 @@
 
 #include <QObject>
 #include <QtQmlIntegration>
+#include <QFileDialog>
 #include "src/utility/OpenCVProcessor.hpp"
 
 class AppState : public QObject {
-    Q_OBJECT
+Q_OBJECT
+
     QML_ELEMENT
     QML_SINGLETON
-
-    Q_PROPERTY(QString imgPath MEMBER imgPath NOTIFY imgPathChanged)
 
 public:
     AppState() = default;
 
     inline static int typeId;
 
-    QString imgPath = "/test.bmp";
-    OpenCVProcessor* processor;
+    OpenCVProcessor *processor;
 
-signals:
-    void imgPathChanged();
+public slots:
+//    void openImage() const {
+//        QString imgPath = QFileDialog::getOpenFileName();
+//        if (imgPath != "")
+//            processor->loadImage(imgPath.toStdString());
+//    }
+
+    void loadImage(const QString &imgPath) const {
+        if (imgPath != "")
+            processor->loadImage(imgPath.toStdString());
+    }
+
+    void resetImage() const {
+        processor->resetImage();
+    }
+
+    void fourierTrans() const {
+        processor->fourierTrans();
+    }
 
 };
 

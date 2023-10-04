@@ -2,28 +2,42 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
 import "components"
 import dip
 
-//window containing the application
+// window containing the application
 ApplicationWindow {
     height: 720
-
-    //title of the application
+    // title of the application
     title: "SEU DIP"
     visible: true
     width: 1280
 
-    //menu containing two menu items
+    // menu containing two menu items
     menuBar: MenuBar {
         Menu {
+            property var fileDialog: FileDialog {
+                id: fileDialog
+
+                onAccepted: {
+                    console.log(selectedFile);
+                    AppState.loadImage(selectedFile.toString().replace("file://", ""));
+
+                    originImageViewer.reload();
+                    processedImageViewer.reload();
+                }
+            }
+
             title: "File"
 
             MenuItem {
                 text: "&Open"
 
                 onTriggered: {
-                    console.log("Open action triggered");
+                    // console.log("Open action triggered");
+                    // AppState.openImage();
+                    fileDialog.open()
                 }
             }
             MenuItem {
@@ -34,19 +48,7 @@ ApplicationWindow {
         }
     }
 
-    //Content Area
-
-    // Rectangle {
-    //     anchors.fill: parent
-    //
-    //     //a button in the middle of the content area
-    //     Button {
-    //         anchors.horizontalCenter: parent.horizontalCenter
-    //         anchors.verticalCenter: parent.verticalCenter
-    //         text: AppState.imgPath
-    //     }
-    // }
-
+    // Content Area
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
@@ -56,32 +58,26 @@ ApplicationWindow {
             Layout.fillWidth: true
 
             RowLayout {
-                spacing: 0
                 anchors.fill: parent
+                spacing: 0
 
                 Item {
-                    Layout.fillWidth: true
                     Layout.fillHeight: true
+                    Layout.fillWidth: true
 
                     ImageViewer {
+                        id: originImageViewer
+
                         image: "image://cv/origin"
                     }
                 }
                 Item {
-                    Layout.fillWidth: true
                     Layout.fillHeight: true
-
-                    // Layout.minimumWidth: 100
-                    // Layout.preferredHeight: 100
-                    // Layout.preferredWidth: 200
-                    // color: 'plum'
-                    //
-                    // Text {
-                    //     anchors.centerIn: parent
-                    //     text: parent.width + 'x' + parent.height
-                    // }
+                    Layout.fillWidth: true
 
                     ImageViewer {
+                        id: processedImageViewer
+
                         image: "image://cv/processed"
                     }
                 }
@@ -93,29 +89,34 @@ ApplicationWindow {
             id: buttonRow
 
             Layout.alignment: Qt.AlignRight
-            // Layout.fillHeight: true
             Layout.margins: 16
             Layout.preferredHeight: 32
             spacing: 2
 
             Button {
-                text: parent.width + 'x' + parent.height
+                text: "Fourier transform"
 
                 onClicked: {
+                    AppState.fourierTrans();
+                    originImageViewer.reload();
+                    processedImageViewer.reload();
                 }
             }
             Button {
-                text: "Save Image"
+                text: "Reset"
 
                 onClicked: {
+                    AppState.resetImage();
+                    originImageViewer.reload();
+                    processedImageViewer.reload();
                 }
             }
-            Button {
-                text: AppState.imgPath
-
-                onClicked: {
-                }
-            }
+            // Button {
+            //     text: AppState.imgPath
+            //
+            //     onClicked: {
+            //     }
+            // }
         }
     }
 }

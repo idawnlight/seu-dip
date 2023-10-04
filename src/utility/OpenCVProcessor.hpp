@@ -16,6 +16,53 @@ public:
         return processedImage;
     };
 
+    void resetImage() {
+        processedImage = originImage.clone();
+    }
+
+    void fourierTrans() {
+        cv::cvtColor(originImage, processedImage, cv::COLOR_BGR2GRAY);
+
+        cv::Mat planes[] = { cv::Mat_<float>(processedImage), cv::Mat::zeros(processedImage.size(), CV_32F) };
+
+        cv::Mat complexI;
+        cv::merge(planes, 2, complexI);
+        std::cout << complexI.size() << std::endl;
+        std::cout << planes->size() << std::endl;
+
+        cv::dft(complexI, complexI);
+
+        split(complexI, planes);
+        magnitude(planes[0], planes[1], planes[0]);
+        cv::Mat magnitudeImage = planes[0];
+
+        magnitudeImage += cv::Scalar::all(1);
+        cv::log(magnitudeImage, magnitudeImage);
+
+        magnitudeImage = magnitudeImage(cv::Rect(0, 0, magnitudeImage.cols & -2, magnitudeImage.rows & -2));
+
+        int cx = magnitudeImage.cols / 2;
+        int cy = magnitudeImage.rows / 2;
+
+        cv::Mat q0(magnitudeImage, cv::Rect(0, 0, cx, cy));
+        cv::Mat q1(magnitudeImage, cv::Rect(cx, 0, cx, cy));
+        cv::Mat q2(magnitudeImage, cv::Rect(0, cy, cx, cy));
+        cv::Mat q3(magnitudeImage, cv::Rect(cx, cy, cx, cy));
+
+        cv::Mat tmp;
+        q0.copyTo(tmp);
+        q3.copyTo(q0);
+        tmp.copyTo(q3);
+        q1.copyTo(tmp);
+        q2.copyTo(q1);
+        tmp.copyTo(q2);
+
+        cv::normalize(magnitudeImage, magnitudeImage, 0, 1, cv::NORM_MINMAX);
+        magnitudeImage.convertTo(magnitudeImage, CV_8UC1, 255, 0);
+
+        processedImage = magnitudeImage;
+    }
+
     void loadImage(const std::string& path) {
         originImage = cv::imread(path);
         processedImage = originImage.clone();
