@@ -20,12 +20,6 @@ public:
     OpenCVProcessor *processor;
 
 public slots:
-//    void openImage() const {
-//        QString imgPath = QFileDialog::getOpenFileName();
-//        if (imgPath != "")
-//            processor->loadImage(imgPath.toStdString());
-//    }
-
     void loadImage(const QString &imgPath) const {
         if (imgPath != "")
             processor->loadImage(imgPath.toStdString());

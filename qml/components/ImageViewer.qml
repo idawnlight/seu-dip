@@ -1,28 +1,40 @@
 import QtQuick
 
-Item {
+Rectangle {
     id: root
-
-    anchors.fill: parent
 
     required property string image
 
-    Image {
-        id: image
-        anchors.fill: parent
-        source: root.image
-        fillMode: Image.PreserveAspectFit
-    }
-
-    // MouseArea {
-    //     anchors.fill: parent
-    //
-    //     onClicked: {
-    //         rect.rotation += 45;
-    //     }
-    // }
-
     function reload() {
         image.source = root.image + Math.random();
+    }
+
+    anchors.fill: parent
+    clip: true
+    color: "grey"
+
+    Image {
+        id: image
+
+        // anchors.centerIn: parent
+        // anchors.fill: parent
+        fillMode: Image.PreserveAspectFit
+        source: root.image
+        height: parent.height
+        width: parent.width
+        x: parent.width / 2 - width / 2
+        y: parent.height / 2 - height / 2
+    }
+    MouseArea {
+        anchors.fill: parent
+        drag.target: image
+
+        onWheel: {
+            if (wheel.angleDelta.y > 0) {
+                image.scale = image.scale * 1.1;
+            } else {
+                image.scale = image.scale / 1.1;
+            }
+        }
     }
 }

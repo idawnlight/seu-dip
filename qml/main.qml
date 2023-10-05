@@ -35,8 +35,6 @@ ApplicationWindow {
                 text: "&Open"
 
                 onTriggered: {
-                    // console.log("Open action triggered");
-                    // AppState.openImage();
                     fileDialog.open()
                 }
             }
@@ -53,13 +51,14 @@ ApplicationWindow {
         anchors.fill: parent
         spacing: 0
 
-        Item {
+        Rectangle {
             Layout.fillHeight: true
             Layout.fillWidth: true
+            color: "black"
 
             RowLayout {
                 anchors.fill: parent
-                spacing: 0
+                spacing: 1
 
                 Item {
                     Layout.fillHeight: true
@@ -111,12 +110,6 @@ ApplicationWindow {
                     processedImageViewer.reload();
                 }
             }
-            // Button {
-            //     text: AppState.imgPath
-            //
-            //     onClicked: {
-            //     }
-            // }
         }
     }
 }
