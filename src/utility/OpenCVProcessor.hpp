@@ -6,21 +6,8 @@
 
 class OpenCVProcessor {
 public:
-    OpenCVProcessor() = default;
-
-    [[nodiscard]] const cv::Mat &getOriginImage() const {
-        return originImage;
-    };
-
-    [[nodiscard]] const cv::Mat &getProcessedImage() const {
-        return processedImage;
-    };
-
-    void resetImage() {
-        processedImage = originImage.clone();
-    }
-
-    void fourierTrans() {
+    static cv::Mat fourierTrans(const cv::Mat &originImage) {
+        cv::Mat processedImage;
         cv::cvtColor(originImage, processedImage, cv::COLOR_BGR2GRAY);
 
         cv::Mat planes[] = { cv::Mat_<float>(processedImage), cv::Mat::zeros(processedImage.size(), CV_32F) };
@@ -61,16 +48,7 @@ public:
         magnitudeImage.convertTo(magnitudeImage, CV_8UC1, 255, 0);
 
         processedImage = magnitudeImage;
-    }
-
-    void loadImage(const std::string& path) {
-        originImage = cv::imread(path);
-        processedImage = originImage.clone();
-    }
-
-    void loadImage(const std::vector<uchar>& data) {
-        originImage = cv::imdecode(data, cv::IMREAD_COLOR);
-        processedImage = originImage.clone();
+        return processedImage;
     }
 
     static QPixmap cvtMat2Pixmap(const cv::Mat &mat) {
@@ -93,9 +71,6 @@ public:
         QPixmap pixmap = QPixmap::fromImage(img);
         return pixmap;
     }
-private:
-    cv::Mat originImage;
-    cv::Mat processedImage;
 };
 
 

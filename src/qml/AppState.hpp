@@ -5,6 +5,7 @@
 #include <QtQmlIntegration>
 #include <QFileDialog>
 #include "src/utility/OpenCVProcessor.hpp"
+#include "ImageProvider.hpp"
 
 class AppState : public QObject {
 Q_OBJECT
@@ -17,20 +18,20 @@ public:
 
     inline static int typeId;
 
-    OpenCVProcessor *processor;
+    ImageProvider *provider = nullptr;
 
 public slots:
     void loadImage(const QString &imgPath) const {
         if (imgPath != "")
-            processor->loadImage(imgPath.toStdString());
+            provider->loadImage(imgPath.toStdString());
     }
 
     void resetImage() const {
-        processor->resetImage();
+        provider->resetImage();
     }
 
     void fourierTrans() const {
-        processor->fourierTrans();
+        provider->fourierTrans();
     }
 
 };

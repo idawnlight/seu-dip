@@ -9,6 +9,10 @@ Rectangle {
         image.source = root.image + Math.random();
     }
 
+    function reset() {
+        image.scale = 1;
+    }
+
     anchors.fill: parent
     clip: true
     color: "grey"
@@ -29,7 +33,7 @@ Rectangle {
         anchors.fill: parent
         drag.target: image
 
-        onWheel: {
+        onWheel: (wheel) => {
             if (wheel.angleDelta.y > 0) {
                 image.scale = image.scale * 1.1;
             } else {

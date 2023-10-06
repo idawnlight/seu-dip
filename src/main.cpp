@@ -2,20 +2,20 @@
 #include <QPushButton>
 #include <QQmlApplicationEngine>
 #include "qml/AppState.hpp"
-#include "OpenCVImageProvider.hpp"
+#include "ImageProvider.hpp"
 
 int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
 
-    auto processor = new OpenCVProcessor();
+    auto provider = new ImageProvider();
     QFile lena(":/dip/res/lena.bmp");
     lena.open(QIODevice::ReadOnly);
     QByteArray data = lena.readAll();
-    processor->loadImage(std::vector<uchar>(data.begin(), data.end()));
+    provider->loadImage(std::vector<uchar>(data.begin(), data.end()));
 
     // Register OpenCV Image Provider
-    engine.addImageProvider("cv", new OpenCVImageProvider(processor));
+    engine.addImageProvider("cv", provider);
 
     engine.load(QUrl(u"qrc:/dip/qml/main.qml"_qs));
 
@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
     AppState::typeId = qmlTypeId("dip", 1, 0, "AppState");
     auto *appState = engine.singletonInstance<AppState *>(AppState::typeId);
 
-    appState->processor = processor;
+    appState->provider = provider;
 
     return QGuiApplication::exec();
 }

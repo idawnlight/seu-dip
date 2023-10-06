@@ -90,7 +90,6 @@ ApplicationWindow {
             Layout.alignment: Qt.AlignRight
             Layout.margins: 16
             Layout.preferredHeight: 32
-            spacing: 2
 
             Button {
                 text: "Fourier transform"
@@ -108,6 +107,8 @@ ApplicationWindow {
                     AppState.resetImage();
                     originImageViewer.reload();
                     processedImageViewer.reload();
+                    originImageViewer.reset();
+                    processedImageViewer.reset();
                 }
             }
         }
