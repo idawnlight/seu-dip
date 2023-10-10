@@ -8,11 +8,19 @@ import dip
 
 // window containing the application
 ApplicationWindow {
+    id: window
     height: 720
     // title of the application
     title: "SEU DIP"
     visible: true
     width: 1280
+
+    function reload() {
+        originImageViewer.reload();
+        processedImageViewer.reload();
+        originHistogram.reload();
+        processedHistogram.reload();
+    }
 
     // menu containing two menu items
     menuBar: MenuBar {
@@ -23,9 +31,7 @@ ApplicationWindow {
                 onAccepted: {
                     console.log(selectedFile);
                     AppState.loadImage(selectedFile.toString().replace("file://", ""));
-
-                    originImageViewer.reload();
-                    processedImageViewer.reload();
+                    window.reload();
                 }
             }
 
@@ -35,13 +41,61 @@ ApplicationWindow {
                 text: "&Open"
 
                 onTriggered: {
-                    fileDialog.open()
+                    fileDialog.open();
                 }
             }
             MenuItem {
                 text: "Exit"
 
                 onTriggered: Qt.quit()
+            }
+        }
+        Menu {
+            title: "Transform"
+
+            MenuItem {
+                text: "Fourier transform"
+
+                onTriggered: {
+                    AppState.fourierTrans();
+                    window.reload();
+                }
+            }
+        }
+        Menu {
+            title: "Histogram"
+
+            MenuItem {
+                text: "Histogram equalization (Gray)"
+
+                onTriggered: {
+                    AppState.histogramEqualization("Gray");
+                    window.reload();
+                }
+            }
+            MenuItem {
+                text: "Histogram equalization (YUV)"
+
+                onTriggered: {
+                    AppState.histogramEqualization("YUV");
+                    window.reload();
+                }
+            }
+            MenuItem {
+                text: "CLAHE (Gray)"
+
+                onTriggered: {
+                    AppState.applyCLAHE("Gray");
+                    window.reload();
+                }
+            }
+            MenuItem {
+                text: "CLAHE (YUV)"
+
+                onTriggered: {
+                    AppState.applyCLAHE("YUV");
+                    window.reload();
+                }
             }
         }
     }
@@ -64,20 +118,56 @@ ApplicationWindow {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
 
-                    ImageViewer {
-                        id: originImageViewer
+                    Item {
+                        height: parent.height - 100
+                        width: parent.width
 
-                        image: "image://cv/origin"
+                        ImageViewer {
+                            id: originImageViewer
+
+                            image: "image://cv/origin"
+                        }
+                    }
+                    Item {
+                        anchors.bottom: parent.bottom
+                        height: 100
+                        width: parent.width
+
+                        ImageViewer {
+                            id: originHistogram
+
+                            dragable: false
+                            fill: true
+                            image: "image://cv/histogram/origin"
+                        }
                     }
                 }
                 Item {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
 
-                    ImageViewer {
-                        id: processedImageViewer
+                    Item {
+                        height: parent.height - 100
+                        width: parent.width
 
-                        image: "image://cv/processed"
+                        ImageViewer {
+                            id: processedImageViewer
+
+                            image: "image://cv/processed"
+                        }
+                    }
+                    Item {
+                        anchors.bottom: parent.bottom
+                        height: 100
+                        width: parent.width
+
+                        ImageViewer {
+                            id: processedHistogram
+
+                            dragable: false
+                            fill: true
+                            image: "image://cv/histogram/processed"
+                        }
                     }
                 }
             }
@@ -91,24 +181,23 @@ ApplicationWindow {
             Layout.margins: 16
             Layout.preferredHeight: 32
 
-            Button {
-                text: "Fourier transform"
-
-                onClicked: {
-                    AppState.fourierTrans();
-                    originImageViewer.reload();
-                    processedImageViewer.reload();
-                }
-            }
+            // Button {
+            //     text: "Fourier transform"
+            //
+            //     onClicked: {
+            //         AppState.fourierTrans();
+            //         originImageViewer.reload();
+            //         processedImageViewer.reload();
+            //     }
+            // }
             Button {
                 text: "Reset"
 
                 onClicked: {
                     AppState.resetImage();
-                    originImageViewer.reload();
-                    processedImageViewer.reload();
                     originImageViewer.reset();
                     processedImageViewer.reset();
+                    window.reload();
                 }
             }
         }

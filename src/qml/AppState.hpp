@@ -34,6 +34,14 @@ public slots:
         provider->fourierTrans();
     }
 
+    void histogramEqualization(const QString& method = "YUV") const {
+        provider->histogramEqualization(method);
+    }
+
+    void applyCLAHE(const QString& method = "YUV") const {
+        provider->applyCLAHE(method);
+    }
+
 };
 
 #endif //SEU_DIP_APPSTATE_HPP
