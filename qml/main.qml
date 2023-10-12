@@ -66,7 +66,7 @@ ApplicationWindow {
             title: "Histogram"
 
             MenuItem {
-                text: "Histogram equalization (Gray)"
+                text: "HE (Gray)"
 
                 onTriggered: {
                     AppState.histogramEqualization("Gray");
@@ -74,10 +74,18 @@ ApplicationWindow {
                 }
             }
             MenuItem {
-                text: "Histogram equalization (YUV)"
+                text: "HE (YUV)"
 
                 onTriggered: {
                     AppState.histogramEqualization("YUV");
+                    window.reload();
+                }
+            }
+            MenuItem {
+                text: "HE (Custom, YUV)"
+
+                onTriggered: {
+                    AppState.histogramEqualization("Custom");
                     window.reload();
                 }
             }
@@ -94,6 +102,14 @@ ApplicationWindow {
 
                 onTriggered: {
                     AppState.applyCLAHE("YUV");
+                    window.reload();
+                }
+            }
+            MenuItem {
+                text: "CLAHE (Custom, YUV)"
+
+                onTriggered: {
+                    AppState.applyCLAHE("Custom");
                     window.reload();
                 }
             }

@@ -2,7 +2,8 @@
 #define SEU_DIP_IMAGEPROVIDER_HPP
 
 #include <QQuickImageProvider>
-#include "src/utility/OpenCVProcessor.hpp"
+#include "../processors/OpenCVProcessor.hpp"
+#include "../processors/CustomProcessor.hpp"
 
 class ImageProvider : public QQuickImageProvider {
 public:
@@ -53,6 +54,8 @@ public:
             processedImage = OpenCVProcessor::histogramEqualization(originImage);
         else if (method == "Gray")
             processedImage = OpenCVProcessor::histogramEqualizationGray(originImage);
+        else if (method == "Custom")
+            processedImage = CustomProcessor::histogramEqualization(originImage);
     }
 
     void applyCLAHE(const QString& method = "YUV") {
@@ -60,6 +63,8 @@ public:
             processedImage = OpenCVProcessor::applyCLAHE(originImage);
         else if (method == "Gray")
             processedImage = OpenCVProcessor::applyCLAHEGray(originImage);
+        else if (method == "Custom")
+            processedImage = CustomProcessor::CLAHE(originImage);
     }
 
 private:

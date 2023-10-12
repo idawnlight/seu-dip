@@ -14,8 +14,8 @@ public:
 
         cv::Mat complexI;
         cv::merge(planes, 2, complexI);
-        std::cout << complexI.size() << std::endl;
-        std::cout << planes->size() << std::endl;
+//        std::cout << complexI.size() << std::endl;
+//        std::cout << planes->size() << std::endl;
 
         cv::dft(complexI, complexI);
 

@@ -1,7 +1,6 @@
 #include <QApplication>
-#include <QPushButton>
 #include <QQmlApplicationEngine>
-#include "qml/AppState.hpp"
+#include "AppState.hpp"
 #include "ImageProvider.hpp"
 
 int main(int argc, char *argv[]) {

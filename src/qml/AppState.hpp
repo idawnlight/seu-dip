@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QtQmlIntegration>
 #include <QFileDialog>
-#include "src/utility/OpenCVProcessor.hpp"
 #include "ImageProvider.hpp"
 
 class AppState : public QObject {
