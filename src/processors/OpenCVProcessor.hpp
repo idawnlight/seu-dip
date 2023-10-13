@@ -118,6 +118,8 @@ public:
         int hist_h = 256;
         int bin_w = cvRound((double) hist_w / histSize);
         cv::Mat histImage(hist_h, hist_w, CV_8UC1, cv::Scalar(0, 0, 0));
+
+        // normalize to height of image
         cv::normalize(hist, hist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
 
         for (int i = 0; i < histSize; i++) {
@@ -125,9 +127,10 @@ public:
             auto start_i = bin_w * (i - 1) < 0 ? 0 : bin_w * (i - 1);
             auto end_i = bin_w * i > hist_w ? hist_w : bin_w * i;
             for (int j = start_i; j < end_i; j++) {
+                // draw line
                 cv::line(histImage, cv::Point(j, hist_h),
                          cv::Point(j, hist_h - cvRound(hist.at<float>(i))),
-                         cv::Scalar(255, 255, 255), 2);
+                         cv::Scalar(255, 255, 255), 1);
             }
         }
 

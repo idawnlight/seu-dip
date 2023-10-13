@@ -5,7 +5,7 @@
 
 class CustomProcessor {
 public:
-    static cv::Mat histogramEqualizationGray(const cv::Mat &originImage, int *mapping = nullptr) {
+    static cv::Mat histogramEqualizationGray(const cv::Mat &originImage) {
         assert(originImage.channels() == 1);
 
         cv::Mat luma = originImage;
@@ -20,9 +20,7 @@ public:
 
         // Calculate mapping
         int sum = 0;
-        if (mapping == nullptr) {
-            mapping = new int[256];
-        }
+        int *mapping = new int[256];
         for (int i = 0; i < 256; ++i) {
             sum += histogram[i];
             mapping[i] = sum * 255 / (luma.rows * luma.cols);
@@ -51,14 +49,13 @@ public:
         return processedImage;
     }
 
-    static cv::Mat CLAHE(const cv::Mat &originImage) {
+    static cv::Mat CLAHE(const cv::Mat &originImage, int tilesX = 8, int tilesY = 8) {
         cv::Mat processedImage;
         cv::cvtColor(originImage, processedImage, cv::COLOR_BGR2YUV);
         std::vector<cv::Mat> channels;
         cv::split(processedImage, channels);
         cv::Mat luma = channels[0];
 
-        int tilesX = 8, tilesY = 8;
         int mapping[tilesX * tilesY][256];
         cv::Size tileSize;
         cv::Mat padded;
