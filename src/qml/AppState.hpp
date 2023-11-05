@@ -55,7 +55,7 @@ public slots:
         provider->applyCLAHE(method);
     }
 
-    void gaussianNoise(double mean = 0, double stddev = 36) const {
+    void gaussianNoise(double mean = 0, double stddev = 24) const {
         provider->gaussianNoise(mean, stddev);
     }
 

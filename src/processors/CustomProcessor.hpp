@@ -178,13 +178,14 @@ public:
     static cv::Mat medianFilter(const cv::Mat &originImage, int kernelSize = 3) {
         cv::Mat processedImage = originImage.clone();
         cv::Mat padded;
-        cv::copyMakeBorder(processedImage, padded, kernelSize / 2, kernelSize / 2, kernelSize / 2, kernelSize / 2,
+        int padding = kernelSize / 2;
+        cv::copyMakeBorder(processedImage, padded, padding, padding, padding, padding,
                            cv::BORDER_REFLECT_101);
 
         for (int y = 0; y < processedImage.rows; y++) {
             for (int x = 0; x < processedImage.cols; x++) {
-                int ax = x + kernelSize / 2;
-                int ay = y + kernelSize / 2;
+                int ax = x + padding;
+                int ay = y + padding;
 
                 int block[kernelSize * kernelSize];
                 for (int i = 0; i < kernelSize; i++) {
@@ -204,13 +205,14 @@ public:
     static cv::Mat meanFilter(const cv::Mat &originImage, int kernelSize = 3) {
         cv::Mat processedImage = originImage.clone();
         cv::Mat padded;
-        cv::copyMakeBorder(processedImage, padded, kernelSize / 2, kernelSize / 2, kernelSize / 2, kernelSize / 2,
+        int padding = kernelSize / 2;
+        cv::copyMakeBorder(processedImage, padded, padding, padding, padding, padding,
                            cv::BORDER_REFLECT_101);
 
         for (int y = 0; y < processedImage.rows; y++) {
             for (int x = 0; x < processedImage.cols; x++) {
-                int ax = x + kernelSize / 2;
-                int ay = y + kernelSize / 2;
+                int ax = x + padding;
+                int ay = y + padding;
 
                 int sum = 0;
                 for (int i = 0; i < kernelSize; i++) {
@@ -269,43 +271,41 @@ public:
     }
 
     static cv::Mat nonLocalMeanFilter(const cv::Mat &originImage) {
-        int searchWindowSize = 7;
-        int blockWindowSize = 3;
+        int halfSearchSize = 7;
+        int halfBlockSize = 3;
+        int padding = halfSearchSize + halfBlockSize;
         double h = 10;
 
         cv::Mat processedImage = originImage.clone();
         cv::Mat padded;
-        cv::copyMakeBorder(processedImage, padded, searchWindowSize / 2, searchWindowSize / 2, searchWindowSize / 2,
-                           searchWindowSize / 2, cv::BORDER_REFLECT_101);
+        cv::copyMakeBorder(processedImage, padded, padding, padding, padding,
+                           padding, cv::BORDER_REFLECT_101);
 
         for (int y = 0; y < processedImage.rows; y++) {
             for (int x = 0; x < processedImage.cols; x++) {
-                double sum = 0.0;
-                double totalWeight = 0.0;
-                cv::Rect blockROI(x - blockWindowSize / 2, y - blockWindowSize / 2, blockWindowSize, blockWindowSize);
+                cv::Rect currentBlock(x - halfBlockSize + padding, y - halfBlockSize + padding, 2 * halfBlockSize + 1, 2 * halfBlockSize + 1);
 
-                for (int m = -searchWindowSize / 2; m <= searchWindowSize / 2; m++) {
-                    for (int n = -searchWindowSize / 2; n <= searchWindowSize / 2; n++) {
-                        cv::Rect searchROI(x + m - blockWindowSize / 2, y + n - blockWindowSize / 2, blockWindowSize,
-                                           blockWindowSize);
+                double p = 0, w = 0;
 
-                        // Calculate the weight for this block
-                        double weight = 0.0;
-                        for (int i = 0; i < blockWindowSize; i++) {
-                            for (int j = 0; j < blockWindowSize; j++) {
-                                double diff = padded.at<uchar>(blockROI.y + i, blockROI.x + j) - padded.at<uchar>(searchROI.y + i, searchROI.x + j);
-                                weight += exp(-(diff * diff) / (2.0 * h * h));
+                for (int i = -halfSearchSize; i <= halfSearchSize; i++) {
+                    for (int j = -halfSearchSize; j <= halfSearchSize; j++) {
+                        cv::Rect searchBlock(x + j - halfBlockSize + padding, y + i - halfBlockSize + padding, 2 * halfBlockSize + 1, 2 * halfBlockSize + 1);
+
+                        double d = 0;
+                        for (int k = 0; k < 2 * halfBlockSize + 1; k++) {
+                            for (int l = 0; l < 2 * halfBlockSize + 1; l++) {
+                                d += std::pow(padded.at<uchar>(currentBlock.y + k, currentBlock.x + l) - padded.at<uchar>(searchBlock.y + k, searchBlock.x + l), 2);
                             }
                         }
+                        d /= (2 * halfBlockSize + 1) * (2 * halfBlockSize + 1);
 
-                        // Update the sum and total weight
-                        sum += weight * padded.at<uchar>(searchROI.y + blockWindowSize / 2, searchROI.x + blockWindowSize / 2);
-                        totalWeight += weight;
+                        double w_i = std::exp(-std::max(d - 2 * h * h, 0.0) / (h * h));
+                        w += w_i;
+                        p += w_i * padded.at<uchar>(searchBlock.y + halfBlockSize, searchBlock.x + halfBlockSize);
                     }
                 }
 
-                // Update the pixel in the processed image
-                processedImage.at<uchar>(y, x) = static_cast<uchar>(cvRound(sum / totalWeight));
+                processedImage.at<uchar>(y, x) = p / w;
             }
         }
 
