@@ -92,6 +92,24 @@ public:
         return processedImage;
     }
 
+    static cv::Mat medianFilter(const cv::Mat &originImage, int kernelSize = 3) {
+        cv::Mat processedImage;
+        cv::medianBlur(originImage, processedImage, kernelSize);
+        return processedImage;
+    }
+
+    static cv::Mat meanFilter(const cv::Mat &originImage, int kernelSize = 3) {
+        cv::Mat processedImage;
+        cv::blur(originImage, processedImage, cv::Size(kernelSize, kernelSize));
+        return processedImage;
+    }
+
+    static cv::Mat nonLocalMeanFilter(const cv::Mat &originImage) {
+        cv::Mat processedImage;
+        cv::fastNlMeansDenoising(originImage, processedImage);
+        return processedImage;
+    }
+
     static cv::Mat drawHistogram(const cv::Mat &originImage) {
         cv::Mat grayImage;
         switch (originImage.type()) {

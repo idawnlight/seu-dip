@@ -21,6 +21,10 @@ public:
         processedImage = originImage.clone();
     }
 
+    void swapImage() {
+        originImage = processedImage.clone();
+    }
+
     QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize) override {
         if (id.startsWith("histogram/origin")) {
             return OpenCVProcessor::cvtMat2Pixmap(OpenCVProcessor::drawHistogram(getOriginImage()));
@@ -35,13 +39,18 @@ public:
         }
     }
 
-    void loadImage(const std::string& path) {
-        originImage = cv::imread(path);
+    void loadImage(const std::string& path, int flag = cv::IMREAD_COLOR) {
+        originImage = cv::imread(path, flag);
         processedImage = originImage.clone();
     }
 
-    void loadImage(const std::vector<uchar>& data) {
-        originImage = cv::imdecode(data, cv::IMREAD_COLOR);
+    void loadImage(const std::vector<uchar>& data, int flag = cv::IMREAD_COLOR) {
+        originImage = cv::imdecode(data, flag);
+        processedImage = originImage.clone();
+    }
+
+    void blackImage(int width = 100, int height = 100) {
+        originImage = cv::Mat::zeros(width, height, CV_8UC1);
         processedImage = originImage.clone();
     }
 
@@ -65,6 +74,30 @@ public:
             processedImage = OpenCVProcessor::applyCLAHEGray(originImage);
         else if (method == "Custom")
             processedImage = CustomProcessor::CLAHE(originImage);
+    }
+
+    void gaussianNoise(double mean = 0, double stddev = 10) {
+        processedImage = CustomProcessor::gaussianNoise(originImage, mean, stddev);
+    }
+
+    void saltAndPepperNoise() {
+        processedImage = CustomProcessor::saltAndPepperNoise(originImage);
+    }
+
+    void medianFilter(int kernelSize = 3) {
+        processedImage = CustomProcessor::medianFilter(originImage, kernelSize);
+    }
+
+    void meanFilter(int kernelSize = 3) {
+        processedImage = CustomProcessor::meanFilter(originImage, kernelSize);
+    }
+
+    void adaptiveMedianFilter() {
+        processedImage = CustomProcessor::adaptiveMedianFilter(originImage);
+    }
+
+    void nonLocalMeanFilter() {
+        processedImage = CustomProcessor::nonLocalMeanFilter(originImage);
     }
 
 private:

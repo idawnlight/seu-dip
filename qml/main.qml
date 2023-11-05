@@ -28,9 +28,11 @@ ApplicationWindow {
             property var fileDialog: FileDialog {
                 id: fileDialog
 
+                property var flag: "grayscale"
+
                 onAccepted: {
                     console.log(selectedFile);
-                    AppState.loadImage(selectedFile.toString().replace("file://", ""));
+                    AppState.loadImage(selectedFile.toString().replace("file://", ""), flag);
                     window.reload();
                 }
             }
@@ -38,10 +40,27 @@ ApplicationWindow {
             title: "File"
 
             MenuItem {
-                text: "&Open"
+                text: "&Open (Color)"
 
                 onTriggered: {
+                    fileDialog.flag = "color";
                     fileDialog.open();
+                }
+            }
+            MenuItem {
+                text: "&Open (Grayscale)"
+
+                onTriggered: {
+                    fileDialog.flag = "grayscale";
+                    fileDialog.open();
+                }
+            }
+            MenuItem {
+                text: "Black Image"
+
+                onTriggered: {
+                    AppState.blackImage();
+                    window.reload();
                 }
             }
             MenuItem {
@@ -110,6 +129,62 @@ ApplicationWindow {
 
                 onTriggered: {
                     AppState.applyCLAHE("Custom");
+                    window.reload();
+                }
+            }
+        }
+        Menu {
+            title: "Noise"
+
+            MenuItem {
+                text: "Gaussian Noise"
+
+                onTriggered: {
+                    AppState.gaussianNoise();
+                    window.reload();
+                }
+            }
+            MenuItem {
+                text: "Salt and Pepper Noise"
+
+                onTriggered: {
+                    AppState.saltAndPepperNoise();
+                    window.reload();
+                }
+            }
+        }
+        Menu {
+            title: "Filter"
+
+            MenuItem {
+                text: "Median Filter"
+
+                onTriggered: {
+                    AppState.medianFilter();
+                    window.reload();
+                }
+            }
+            MenuItem {
+                text: "Mean Filter"
+
+                onTriggered: {
+                    AppState.meanFilter();
+                    window.reload();
+                }
+            }
+            MenuItem {
+                text: "Adaptive Median Filter"
+
+                onTriggered: {
+                    AppState.adaptiveMedianFilter();
+                    window.reload();
+                }
+            }
+            MenuItem {
+                text: "Non-local Means Filter"
+
+                onTriggered: {
+                    AppState.nonLocalMeanFilter();
                     window.reload();
                 }
             }
@@ -197,15 +272,15 @@ ApplicationWindow {
             Layout.margins: 16
             Layout.preferredHeight: 32
 
-            // Button {
-            //     text: "Fourier transform"
-            //
-            //     onClicked: {
-            //         AppState.fourierTrans();
-            //         originImageViewer.reload();
-            //         processedImageViewer.reload();
-            //     }
-            // }
+            Button {
+                text: "Swap"
+
+                onClicked: {
+                    AppState.swapImage();
+                    window.reload();
+                }
+            }
+
             Button {
                 text: "Reset"
 

@@ -20,13 +20,27 @@ public:
     ImageProvider *provider = nullptr;
 
 public slots:
-    void loadImage(const QString &imgPath) const {
-        if (imgPath != "")
-            provider->loadImage(imgPath.toStdString());
+    void loadImage(const QString &imgPath, const QString& flag) const {
+        int cv_flag = cv::IMREAD_UNCHANGED;
+        if (flag == "color") {
+            cv_flag = cv::IMREAD_COLOR;
+        } else if (flag == "grayscale") {
+            cv_flag = cv::IMREAD_GRAYSCALE;
+        }
+
+        if (imgPath != "") provider->loadImage(imgPath.toStdString(), cv_flag);
+    }
+
+    void blackImage(int width = 500, int height = 500) const {
+        provider->blackImage(width, height);
     }
 
     void resetImage() const {
         provider->resetImage();
+    }
+
+    void swapImage() const {
+        provider->swapImage();
     }
 
     void fourierTrans() const {
@@ -39,6 +53,30 @@ public slots:
 
     void applyCLAHE(const QString& method = "YUV") const {
         provider->applyCLAHE(method);
+    }
+
+    void gaussianNoise(double mean = 0, double stddev = 36) const {
+        provider->gaussianNoise(mean, stddev);
+    }
+
+    void saltAndPepperNoise() const {
+        provider->saltAndPepperNoise();
+    }
+
+    void medianFilter(int kernelSize = 3) const {
+        provider->medianFilter(kernelSize);
+    }
+
+    void meanFilter(int kernelSize = 3) const {
+        provider->meanFilter(kernelSize);
+    }
+
+    void adaptiveMedianFilter() const {
+        provider->adaptiveMedianFilter();
+    }
+
+    void nonLocalMeanFilter() const {
+        provider->nonLocalMeanFilter();
     }
 
 };
