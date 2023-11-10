@@ -76,7 +76,7 @@ public:
             processedImage = CustomProcessor::CLAHE(originImage);
     }
 
-    void gaussianNoise(double mean = 0, double stddev = 10) {
+    void gaussianNoise(double mean, double stddev) {
         processedImage = CustomProcessor::gaussianNoise(originImage, mean, stddev);
     }
 
@@ -84,11 +84,11 @@ public:
         processedImage = CustomProcessor::saltAndPepperNoise(originImage);
     }
 
-    void medianFilter(int kernelSize = 3) {
+    void medianFilter(int kernelSize) {
         processedImage = CustomProcessor::medianFilter(originImage, kernelSize);
     }
 
-    void meanFilter(int kernelSize = 3) {
+    void meanFilter(int kernelSize) {
         processedImage = CustomProcessor::meanFilter(originImage, kernelSize);
     }
 
@@ -98,6 +98,18 @@ public:
 
     void nonLocalMeanFilter() {
         processedImage = CustomProcessor::nonLocalMeanFilter(originImage);
+    }
+
+    void laplacianSharpening() {
+        processedImage = CustomProcessor::laplacianSharpening(originImage);
+    }
+
+    void unsharpMasking(double sigma = 1.0, double k = 0.5) {
+        processedImage = CustomProcessor::unsharpMasking(originImage, sigma, k);
+    }
+
+    void adaptiveLocalNoiseReduction() {
+        processedImage = CustomProcessor::adaptiveLocalNoiseReduction(originImage);
     }
 
 private:

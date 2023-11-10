@@ -12,7 +12,7 @@ public:
 
         // Calculate histogram
         int histogram[256] = {0};
-        for (int i = 0; i < luma.rows; ++i) {
+        for (int i = 0; i < luma.rows; i++) {
             for (int j = 0; j < luma.cols; ++j) {
                 histogram[luma.at<uchar>(i, j)]++;
             }
@@ -21,14 +21,14 @@ public:
         // Calculate mapping
         int sum = 0;
         int *mapping = new int[256];
-        for (int i = 0; i < 256; ++i) {
+        for (int i = 0; i < 256; i++) {
             sum += histogram[i];
             mapping[i] = sum * 255 / (luma.rows * luma.cols);
         }
 
         // Apply mapping
-        for (int i = 0; i < luma.rows; ++i) {
-            for (int j = 0; j < luma.cols; ++j) {
+        for (int i = 0; i < luma.rows; i++) {
+            for (int j = 0; j < luma.cols; j++) {
                 luma.at<uchar>(i, j) = mapping[luma.at<uchar>(i, j)];
             }
         }
@@ -178,14 +178,14 @@ public:
     static cv::Mat medianFilter(const cv::Mat &originImage, int kernelSize = 3) {
         cv::Mat processedImage = originImage.clone();
         cv::Mat padded;
-        int padding = kernelSize / 2;
+        const int padding = kernelSize / 2;
         cv::copyMakeBorder(processedImage, padded, padding, padding, padding, padding,
                            cv::BORDER_REFLECT_101);
 
         for (int y = 0; y < processedImage.rows; y++) {
             for (int x = 0; x < processedImage.cols; x++) {
-                int ax = x + padding;
-                int ay = y + padding;
+                const int ax = x + padding;
+                const int ay = y + padding;
 
                 int block[kernelSize * kernelSize];
                 for (int i = 0; i < kernelSize; i++) {
@@ -205,14 +205,14 @@ public:
     static cv::Mat meanFilter(const cv::Mat &originImage, int kernelSize = 3) {
         cv::Mat processedImage = originImage.clone();
         cv::Mat padded;
-        int padding = kernelSize / 2;
+        const int padding = kernelSize / 2;
         cv::copyMakeBorder(processedImage, padded, padding, padding, padding, padding,
                            cv::BORDER_REFLECT_101);
 
         for (int y = 0; y < processedImage.rows; y++) {
             for (int x = 0; x < processedImage.cols; x++) {
-                int ax = x + padding;
-                int ay = y + padding;
+                const int ax = x + padding;
+                const int ay = y + padding;
 
                 int sum = 0;
                 for (int i = 0; i < kernelSize; i++) {
@@ -229,7 +229,7 @@ public:
     }
 
     static cv::Mat adaptiveMedianFilter(const cv::Mat &originImage) {
-        int maxSize = 7;
+        const int maxSize = 7;
 
         cv::Mat processedImage = originImage.clone();
         cv::Mat padded;
@@ -238,8 +238,8 @@ public:
 
         for (int y = 0; y < processedImage.rows; y++) {
             for (int x = 0; x < processedImage.cols; x++) {
-                int ax = x + maxSize / 2;
-                int ay = y + maxSize / 2;
+                const int ax = x + maxSize / 2;
+                const int ay = y + maxSize / 2;
 
                 int size = 3;
                 while (size <= maxSize) {
@@ -251,9 +251,9 @@ public:
                     }
 
                     std::sort(block, block + size * size);
-                    int median = block[size * size / 2];
-                    int min = block[0];
-                    int max = block[size * size - 1];
+                    const int median = block[size * size / 2];
+                    const int min = block[0];
+                    const int max = block[size * size - 1];
 
                     if (min < median && median < max) {
                         if (min >= processedImage.at<uchar>(y, x) || processedImage.at<uchar>(y, x) >= max) {
@@ -271,10 +271,10 @@ public:
     }
 
     static cv::Mat nonLocalMeanFilter(const cv::Mat &originImage) {
-        int halfSearchSize = 7;
-        int halfBlockSize = 3;
-        int padding = halfSearchSize + halfBlockSize;
-        double h = 10;
+        const int halfSearchSize = 7;
+        const int halfBlockSize = 3;
+        const int padding = halfSearchSize + halfBlockSize;
+        const double h = 10;
 
         cv::Mat processedImage = originImage.clone();
         cv::Mat padded;
@@ -283,13 +283,13 @@ public:
 
         for (int y = 0; y < processedImage.rows; y++) {
             for (int x = 0; x < processedImage.cols; x++) {
-                cv::Rect currentBlock(x - halfBlockSize + padding, y - halfBlockSize + padding, 2 * halfBlockSize + 1, 2 * halfBlockSize + 1);
+                const cv::Rect currentBlock(x - halfBlockSize + padding, y - halfBlockSize + padding, 2 * halfBlockSize + 1, 2 * halfBlockSize + 1);
 
                 double p = 0, w = 0;
 
                 for (int i = -halfSearchSize; i <= halfSearchSize; i++) {
                     for (int j = -halfSearchSize; j <= halfSearchSize; j++) {
-                        cv::Rect searchBlock(x + j - halfBlockSize + padding, y + i - halfBlockSize + padding, 2 * halfBlockSize + 1, 2 * halfBlockSize + 1);
+                        const cv::Rect searchBlock(x + j - halfBlockSize + padding, y + i - halfBlockSize + padding, 2 * halfBlockSize + 1, 2 * halfBlockSize + 1);
 
                         double d = 0;
                         for (int k = 0; k < 2 * halfBlockSize + 1; k++) {
@@ -299,7 +299,7 @@ public:
                         }
                         d /= (2 * halfBlockSize + 1) * (2 * halfBlockSize + 1);
 
-                        double w_i = std::exp(-std::max(d - 2 * h * h, 0.0) / (h * h));
+                        const double w_i = std::exp(-std::max(d - 2 * h * h, 0.0) / (h * h));
                         w += w_i;
                         p += w_i * padded.at<uchar>(searchBlock.y + halfBlockSize, searchBlock.x + halfBlockSize);
                     }
@@ -311,6 +311,72 @@ public:
 
         return processedImage;
     }
-};
 
+    static cv::Mat laplacianSharpening(const cv::Mat &originImage) {
+        cv::Mat padded, laplacian(originImage.size(), CV_8UC1);
+        cv::copyMakeBorder(originImage, padded, 1, 1, 1, 1, cv::BORDER_REFLECT_101);
+
+        for (int y = 0; y < originImage.rows; y++) {
+            for (int x = 0; x < originImage.cols; x++) {
+                const int ax = x + 1;
+                const int ay = y + 1;
+
+//                int sum = padded.at<uchar>(ay - 1, ax) + padded.at<uchar>(ay + 1, ax) +
+//                          padded.at<uchar>(ay, ax - 1) + padded.at<uchar>(ay, ax + 1) -
+//                          4 * padded.at<uchar>(ay, ax);
+                int sum = padded.at<uchar>(ay - 1, ax - 1) + padded.at<uchar>(ay - 1, ax) + padded.at<uchar>(ay - 1, ax + 1) +
+                          padded.at<uchar>(ay, ax - 1) + padded.at<uchar>(ay, ax + 1) + padded.at<uchar>(ay + 1, ax - 1) +
+                          padded.at<uchar>(ay + 1, ax) + padded.at<uchar>(ay + 1, ax + 1) - 8 * padded.at<uchar>(ay, ax);
+
+                laplacian.at<uchar>(y, x) = std::max(0, std::min(255, sum));
+            }
+        }
+
+        return originImage - laplacian;
+    }
+
+    static cv::Mat unsharpMasking(const cv::Mat &originImage, double sigma = 5, double k = 1) {
+        cv::Mat blurred = originImage.clone();
+
+        cv::GaussianBlur(blurred, blurred, cv::Size(5, 5), sigma);
+
+        return originImage + k * (originImage - blurred);
+    }
+
+    static cv::Mat adaptiveLocalNoiseReduction(const cv::Mat &originImage, int kernelSize = 7) {
+        cv::Mat padded, processedImage = originImage.clone();
+        cv::copyMakeBorder(originImage, padded, 2, 2, 2, 2, cv::BORDER_REFLECT_101);
+
+        const double sigmaEta = 36;
+
+        for (int y = 0; y < originImage.rows; y++) {
+            for (int x = 0; x < originImage.cols; x++) {
+                const int ax = x + 2;
+                const int ay = y + 2;
+
+                // calculate mean and variance
+                double mean = 0, variance = 0;
+                for (int i = 0; i < kernelSize; i++) {
+                    for (int j = 0; j < kernelSize; j++) {
+                        mean += padded.at<uchar>(ay + i - kernelSize / 2, ax + j - kernelSize / 2);
+                    }
+                }
+                mean /= kernelSize * kernelSize;
+                for (int i = 0; i < kernelSize; i++) {
+                    for (int j = 0; j < kernelSize; j++) {
+                        variance += std::pow(padded.at<uchar>(ay + i - kernelSize / 2, ax + j - kernelSize / 2) - mean, 2);
+                    }
+                }
+                variance /= kernelSize * kernelSize;
+
+                if (sigmaEta / variance <= 1)
+                    processedImage.at<uchar>(y, x) = std::max(0, std::min(255, (int) (
+                            processedImage.at<uchar>(y, x) -
+                                sigmaEta / variance * (processedImage.at<uchar>(y, x) - mean))));
+            }
+        }
+
+        return processedImage;
+    }
+};
 #endif //SEU_DIP_CUSTOMPROCESSOR_HPP

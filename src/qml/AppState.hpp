@@ -79,6 +79,18 @@ public slots:
         provider->nonLocalMeanFilter();
     }
 
+    void laplacianSharpening() const {
+        provider->laplacianSharpening();
+    }
+
+    void unsharpMasking(double sigma = 2.0, double k = 1) const {
+        provider->unsharpMasking(sigma, k);
+    }
+
+    void adaptiveLocalNoiseReduction() const {
+        provider->adaptiveLocalNoiseReduction();
+    }
+
 };
 
 #endif //SEU_DIP_APPSTATE_HPP

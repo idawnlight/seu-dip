@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
 
-    auto provider = new ImageProvider();
+    const auto provider = new ImageProvider();
     QFile lena(":/dip/res/lena.bmp");
     lena.open(QIODevice::ReadOnly);
     QByteArray data = lena.readAll();

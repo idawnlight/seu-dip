@@ -2,7 +2,6 @@
 #define SEU_DIP_OPENCVPROCESSOR_HPP
 
 #include <opencv2/opencv.hpp>
-#include <QPixmap>
 
 class OpenCVProcessor {
 public:
@@ -84,7 +83,7 @@ public:
         std::vector<cv::Mat> channels;
         cv::split(processedImage, channels);
 
-        cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
+        const cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
         clahe->setClipLimit(4);
         clahe->apply(channels[0], channels[0]);
         cv::merge(channels, processedImage);

@@ -16,6 +16,7 @@ ApplicationWindow {
     width: 1280
 
     function reload() {
+        console.log("reload");
         originImageViewer.reload();
         processedImageViewer.reload();
         originHistogram.reload();
@@ -34,6 +35,52 @@ ApplicationWindow {
                     console.log(selectedFile);
                     AppState.loadImage(selectedFile.toString().replace("file://", ""), flag);
                     window.reload();
+                }
+            }
+
+            property var unsharpParameterDialog: Dialog {
+                id: unsharpParameterDialog
+
+                parent: content
+                // modal: true
+                standardButtons: Dialog.Ok
+                anchors.centerIn: parent
+
+                onAccepted: {
+                    let sigma = parseFloat(sigmaInput.text);
+                    let k = parseFloat(kInput.text);
+                    console.log([sigma, k]);
+                    AppState.unsharpMasking(sigma, k);
+                    window.reload();
+                }
+
+                Column {
+                    spacing: 8
+                    padding: 16
+                    Row {
+                        Text {
+                            text: "Unsharp Masking"
+                            font.pixelSize: 20
+                        }
+                    }
+                    Row {
+                        Label {
+                            text: "Sigma "
+                        }
+                        TextField {
+                            id: sigmaInput
+                            text: "5"
+                        }
+                    }
+                    Row {
+                        Label {
+                            text: "K "
+                        }
+                        TextField {
+                            id: kInput
+                            text: "1"
+                        }
+                    }
                 }
             }
 
@@ -188,107 +235,134 @@ ApplicationWindow {
                     window.reload();
                 }
             }
+            MenuItem {
+                text: "Laplacian Sharpening"
+
+                onTriggered: {
+                    AppState.laplacianSharpening();
+                    window.reload();
+                }
+            }
+            MenuItem {
+                text: "Unsharp Masking"
+
+                onTriggered: {
+                    unsharpParameterDialog.open();
+                }
+            }
+            MenuItem {
+                text: "Adaptive, local noise reduction filter"
+
+                onTriggered: {
+                    AppState.adaptiveLocalNoiseReduction();
+                    window.reload();
+                }
+            }
         }
     }
 
-    // Content Area
-    ColumnLayout {
+    Item {
+        id: content
         anchors.fill: parent
-        spacing: 0
 
-        Rectangle {
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            color: "black"
+        // Content Area
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 0
 
-            RowLayout {
-                anchors.fill: parent
-                spacing: 1
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                color: "black"
 
-                Item {
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
+                RowLayout {
+                    anchors.fill: parent
+                    spacing: 1
 
                     Item {
-                        height: parent.height - 100
-                        width: parent.width
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
 
-                        ImageViewer {
-                            id: originImageViewer
+                        Item {
+                            height: parent.height - 100
+                            width: parent.width
 
-                            image: "image://cv/origin"
+                            ImageViewer {
+                                id: originImageViewer
+
+                                image: "image://cv/origin"
+                            }
+                        }
+                        Item {
+                            anchors.bottom: parent.bottom
+                            height: 100
+                            width: parent.width
+
+                            ImageViewer {
+                                id: originHistogram
+
+                                dragable: false
+                                fill: true
+                                image: "image://cv/histogram/origin"
+                            }
                         }
                     }
                     Item {
-                        anchors.bottom: parent.bottom
-                        height: 100
-                        width: parent.width
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
 
-                        ImageViewer {
-                            id: originHistogram
+                        Item {
+                            height: parent.height - 100
+                            width: parent.width
 
-                            dragable: false
-                            fill: true
-                            image: "image://cv/histogram/origin"
+                            ImageViewer {
+                                id: processedImageViewer
+
+                                image: "image://cv/processed"
+                            }
+                        }
+                        Item {
+                            anchors.bottom: parent.bottom
+                            height: 100
+                            width: parent.width
+
+                            ImageViewer {
+                                id: processedHistogram
+
+                                dragable: false
+                                fill: true
+                                image: "image://cv/histogram/processed"
+                            }
                         }
                     }
-                }
-                Item {
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-
-                    Item {
-                        height: parent.height - 100
-                        width: parent.width
-
-                        ImageViewer {
-                            id: processedImageViewer
-
-                            image: "image://cv/processed"
-                        }
-                    }
-                    Item {
-                        anchors.bottom: parent.bottom
-                        height: 100
-                        width: parent.width
-
-                        ImageViewer {
-                            id: processedHistogram
-
-                            dragable: false
-                            fill: true
-                            image: "image://cv/histogram/processed"
-                        }
-                    }
-                }
-            }
-        }
-
-        // buttons
-        Row {
-            id: buttonRow
-
-            Layout.alignment: Qt.AlignRight
-            Layout.margins: 16
-            Layout.preferredHeight: 32
-
-            Button {
-                text: "Swap"
-
-                onClicked: {
-                    AppState.swapImage();
-                    window.reload();
                 }
             }
 
-            Button {
-                text: "Reset"
+            // buttons
+            Row {
+                id: buttonRow
 
-                onClicked: {
-                    AppState.resetImage();
-                    originImageViewer.reset();
-                    processedImageViewer.reset();
-                    window.reload();
+                Layout.alignment: Qt.AlignRight
+                Layout.margins: 16
+                Layout.preferredHeight: 32
+
+                Button {
+                    text: "Swap"
+
+                    onClicked: {
+                        AppState.swapImage();
+                        window.reload();
+                    }
+                }
+                Button {
+                    text: "Reset"
+
+                    onClicked: {
+                        AppState.resetImage();
+                        originImageViewer.reset();
+                        processedImageViewer.reset();
+                        window.reload();
+                    }
                 }
             }
         }
