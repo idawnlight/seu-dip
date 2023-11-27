@@ -109,6 +109,24 @@ public:
         return processedImage;
     }
 
+    static cv::Mat jpeg(const cv::Mat &originImage, int quality = 50) {
+        std::vector<uchar> buf;
+        std::vector<int> params;
+        params.push_back(cv::IMWRITE_JPEG_QUALITY);
+        params.push_back(quality);
+        cv::imencode(".jpg", originImage, buf, params);
+        return cv::imdecode(buf, cv::IMREAD_COLOR);
+    }
+
+    static cv::Mat jpeg2000(const cv::Mat &originImage, int quality = 500) {
+        std::vector<uchar> buf;
+        std::vector<int> params;
+        params.push_back(cv::IMWRITE_JPEG2000_COMPRESSION_X1000);
+        params.push_back(quality);
+        cv::imencode(".jp2", originImage, buf, params);
+        return cv::imdecode(buf, cv::IMREAD_COLOR);
+    }
+
     static cv::Mat drawHistogram(const cv::Mat &originImage) {
         cv::Mat grayImage;
         switch (originImage.type()) {

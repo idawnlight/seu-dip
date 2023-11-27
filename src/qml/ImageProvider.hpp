@@ -112,6 +112,14 @@ public:
         processedImage = CustomProcessor::adaptiveLocalNoiseReduction(originImage);
     }
 
+    void jpeg() {
+        processedImage = OpenCVProcessor::jpeg(originImage);
+    }
+
+    void jpeg2000() {
+        processedImage = OpenCVProcessor::jpeg2000(originImage);
+    }
+
 private:
     cv::Mat originImage;
     cv::Mat processedImage;

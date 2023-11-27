@@ -91,6 +91,14 @@ public slots:
         provider->adaptiveLocalNoiseReduction();
     }
 
+    void jpeg() const {
+        provider->jpeg();
+    }
+
+    void jpeg2000() const {
+        provider->jpeg2000();
+    }
+
 };
 
 #endif //SEU_DIP_APPSTATE_HPP

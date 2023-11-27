@@ -259,6 +259,26 @@ ApplicationWindow {
                 }
             }
         }
+        Menu {
+            title: "Compression"
+
+            MenuItem {
+                text: "JPEG"
+
+                onTriggered: {
+                    AppState.jpeg();
+                    window.reload();
+                }
+            }
+            MenuItem {
+                text: "JPEG2000"
+
+                onTriggered: {
+                    AppState.jpeg2000();
+                    window.reload();
+                }
+            }
+        }
     }
 
     Item {
