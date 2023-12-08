@@ -127,6 +127,18 @@ public:
         return cv::imdecode(buf, cv::IMREAD_COLOR);
     }
 
+    static cv::Mat morphologyOpen(const cv::Mat &originImage, const cv::Mat &structuringElement = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3))) {
+        cv::Mat processedImage;
+        cv::morphologyEx(originImage, processedImage, cv::MORPH_OPEN, structuringElement);
+        return processedImage;
+    }
+
+    static cv::Mat cannyEdgeDetection(const cv::Mat &originImage, double threshold1 = 100, double threshold2 = 200) {
+        cv::Mat processedImage;
+        cv::Canny(originImage, processedImage, threshold1, threshold2);
+        return processedImage;
+    }
+
     static cv::Mat drawHistogram(const cv::Mat &originImage) {
         cv::Mat grayImage;
         switch (originImage.type()) {

@@ -120,6 +120,38 @@ public:
         processedImage = OpenCVProcessor::jpeg2000(originImage);
     }
 
+    void morphologyErosion() {
+        processedImage = CustomProcessor::morphologyErosion(originImage);
+    }
+
+    void morphologyDilation() {
+        processedImage = CustomProcessor::morphologyDilation(originImage);
+    }
+
+    void morphologyOpening() {
+        processedImage = CustomProcessor::morphologyOpening(originImage);
+    }
+
+    void morphologyClosing() {
+        processedImage = CustomProcessor::morphologyClosing(originImage);
+    }
+
+    void morphologySpecialForFingerprint() {
+        processedImage = CustomProcessor::morphologySpecialForFingerprint(originImage);
+    }
+
+    void globalThresholding() {
+        processedImage = CustomProcessor::globalThresholding(originImage);
+    }
+
+    void otsuThresholding() {
+        processedImage = CustomProcessor::otsuThresholding(originImage);
+    }
+
+    void cannyEdgeDetection(double threshold1 = 100, double threshold2 = 200) {
+        processedImage = OpenCVProcessor::cannyEdgeDetection(originImage, threshold1, threshold2);
+    }
+
 private:
     cv::Mat originImage;
     cv::Mat processedImage;

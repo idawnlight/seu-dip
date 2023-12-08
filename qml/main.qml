@@ -279,6 +279,84 @@ ApplicationWindow {
                 }
             }
         }
+        Menu {
+            title: "Morphology"
+
+            MenuItem {
+                text: "Erosion"
+
+                onTriggered: {
+                    AppState.morphologyErosion();
+                    window.reload();
+                }
+            }
+
+            MenuItem {
+                text: "Dilation"
+
+                onTriggered: {
+                    AppState.morphologyDilation();
+                    window.reload();
+                }
+            }
+
+            MenuItem {
+                text: "Opening"
+
+                onTriggered: {
+                    AppState.morphologyOpening();
+                    window.reload();
+                }
+            }
+
+            MenuItem {
+                text: "Closing"
+
+                onTriggered: {
+                    AppState.morphologyClosing();
+                    window.reload();
+                }
+            }
+
+            MenuItem {
+                text: "Special for Fingerprint"
+
+                onTriggered: {
+                    AppState.morphologySpecialForFingerprint();
+                    window.reload();
+                }
+            }
+        }
+        Menu {
+            title: "Segmentation"
+
+            MenuItem {
+                text: "Global Thresholding"
+
+                onTriggered: {
+                    AppState.globalThresholding();
+                    window.reload();
+                }
+            }
+
+            MenuItem {
+                text: "Otsu Thresholding"
+
+                onTriggered: {
+                    AppState.otsuThresholding();
+                    window.reload();
+                }
+            }
+
+            MenuItem {
+                text: "Canny Edge Detection"
+
+                onTriggered: {
+                    AppState.cannyEdgeDetection();
+                    window.reload();
+                }
+            }
+        }
     }
 
     Item {

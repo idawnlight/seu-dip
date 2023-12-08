@@ -378,5 +378,156 @@ public:
 
         return processedImage;
     }
+
+    static cv::Mat morphologyErosion(const cv::Mat &originImage, const cv::Mat &structuringElement = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3))) {
+        cv::Mat processedImage = cv::Mat(originImage.size(), CV_8UC1, cv::Scalar(0));
+
+        for (int y = 0; y < originImage.rows - structuringElement.rows / 2; y++) {
+            for (int x = 0; x < originImage.cols - structuringElement.cols / 2; x++) {
+                bool flag = true;
+                for (int i = 0; i < structuringElement.rows; i++) {
+                    for (int j = 0; j < structuringElement.cols; j++) {
+                        if (structuringElement.at<uchar>(i, j) == 0) continue;
+                        if (originImage.at<uchar>(y + i, x + j) == 0) {
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if (!flag) break;
+                }
+
+                processedImage.at<uchar>(y + 1, x + 1) = flag ? 255 : 0;
+            }
+        }
+
+        return processedImage;
+    }
+
+    static cv::Mat morphologyDilation(const cv::Mat &originImage, const cv::Mat &structuringElement = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3))) {
+        cv::Mat processedImage = cv::Mat(originImage.size(), CV_8UC1, cv::Scalar(0));
+
+        for (int y = 0; y < originImage.rows - structuringElement.rows / 2; y++) {
+            for (int x = 0; x < originImage.cols - structuringElement.cols / 2; x++) {
+                bool flag = false;
+                for (int i = 0; i < structuringElement.rows; i++) {
+                    for (int j = 0; j < structuringElement.cols; j++) {
+                        if (structuringElement.at<uchar>(i, j) == 0) continue;
+                        if (originImage.at<uchar>(y + i, x + j) == 255) {
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if (flag) break;
+                }
+
+                processedImage.at<uchar>(y + 1, x + 1) = flag ? 255 : 0;
+            }
+        }
+
+        return processedImage;
+    }
+
+    static cv::Mat morphologyOpening(const cv::Mat &originImage) {
+        cv::Mat structuringElement = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
+        cv::Mat processedImage = morphologyErosion(originImage, structuringElement);
+        processedImage = morphologyDilation(processedImage, structuringElement);
+
+        return processedImage;
+    }
+
+    static cv::Mat morphologySpecialForFingerprint(const cv::Mat &originImage) {
+        cv::Mat processedImage = morphologyErosion(originImage, cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3)));
+        processedImage = morphologyDilation(processedImage, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4, 4)));
+        processedImage = morphologyErosion(processedImage, cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3)));
+        processedImage = morphologyDilation(processedImage, cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3)));
+
+        return processedImage;
+    }
+
+    static cv::Mat morphologyClosing(const cv::Mat &originImage) {
+        cv::Mat structuringElement = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
+        cv::Mat processedImage = morphologyDilation(originImage, structuringElement);
+        processedImage = morphologyErosion(processedImage, structuringElement);
+
+        return processedImage;
+    }
+
+    static cv::Mat globalThresholding(const cv::Mat &originImage) {
+        int threshold = cv::mean(originImage)[0];
+        int t0 = 5;
+
+        while (true) {
+            int m0 = 0, m1 = 0, n0 = 0, n1 = 0;
+            for (int y = 0; y < originImage.rows; y++) {
+                for (int x = 0; x < originImage.cols; x++) {
+                    if (originImage.at<uchar>(y, x) < threshold) {
+                        m0 += originImage.at<uchar>(y, x);
+                        n0++;
+                    } else {
+                        m1 += originImage.at<uchar>(y, x);
+                        n1++;
+                    }
+                }
+            }
+            int t1 = (m0 / n0 + m1 / n1) / 2;
+            if (std::abs(t1 - t0) < 1) break;
+            t0 = t1;
+        }
+
+        cv::Mat processedImage = cv::Mat(originImage.size(), CV_8UC1, cv::Scalar(0));
+        for (int y = 0; y < originImage.rows; y++) {
+            for (int x = 0; x < originImage.cols; x++) {
+                processedImage.at<uchar>(y, x) = originImage.at<uchar>(y, x) < threshold ? 0 : 255;
+            }
+        }
+
+        return processedImage;
+    }
+
+    static cv::Mat otsuThresholding(const cv::Mat &originImage) {
+        double histogram[256] = {0};
+        for (int y = 0; y < originImage.rows; y++) {
+            for (int x = 0; x < originImage.cols; x++) {
+                histogram[originImage.at<uchar>(y, x)]++;
+            }
+        }
+        for (double & i : histogram) {
+            i /= originImage.rows * originImage.cols;
+        }
+
+        double max = 0;
+        int threshold = 0;
+        for (int i = 0; i < 256; i++) {
+            double w0 = 0, w1 = 0, u0 = 0, u1 = 0, u = 0;
+            for (int j = 0; j < 256; j++) {
+                if (j <= i) {
+                    w0 += histogram[j];
+                    u0 += j * histogram[j];
+                } else {
+                    w1 += histogram[j];
+                    u1 += j * histogram[j];
+                }
+            }
+
+            u0 /= w0;
+            u1 /= w1;
+
+            u = w0 * w1 * std::pow(u0 - u1, 2);
+            if (u > max) {
+                max = u;
+                threshold = i;
+            }
+        }
+
+        cv::Mat processedImage = cv::Mat(originImage.size(), CV_8UC1, cv::Scalar(0));
+        for (int y = 0; y < originImage.rows; y++) {
+            for (int x = 0; x < originImage.cols; x++) {
+                processedImage.at<uchar>(y, x) = originImage.at<uchar>(y, x) < threshold ? 0 : 255;
+            }
+        }
+
+        return processedImage;
+    }
+
 };
 #endif //SEU_DIP_CUSTOMPROCESSOR_HPP

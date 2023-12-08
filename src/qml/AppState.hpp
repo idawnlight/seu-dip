@@ -99,6 +99,37 @@ public slots:
         provider->jpeg2000();
     }
 
+    void morphologyErosion() const {
+        provider->morphologyErosion();
+    }
+
+    void morphologyDilation() const {
+        provider->morphologyDilation();
+    }
+
+    void morphologyOpening() const {
+        provider->morphologyOpening();
+    }
+
+    void morphologySpecialForFingerprint() const {
+        provider->morphologySpecialForFingerprint();
+    }
+
+    void morphologyClosing() const {
+        provider->morphologyClosing();
+    }
+
+    void globalThresholding() const {
+        provider->globalThresholding();
+    }
+
+    void otsuThresholding() const {
+        provider->otsuThresholding();
+    }
+
+    void cannyEdgeDetection() const {
+        provider->cannyEdgeDetection();
+    }
 };
 
 #endif //SEU_DIP_APPSTATE_HPP
