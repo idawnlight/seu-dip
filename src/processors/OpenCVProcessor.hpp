@@ -51,8 +51,8 @@ public:
     }
 
     static cv::Mat histogramEqualizationGray(const cv::Mat &originImage) {
-        cv::Mat processedImage;
-        cv::cvtColor(originImage, processedImage, cv::COLOR_BGR2GRAY);
+        cv::Mat processedImage = originImage.clone();
+        if (originImage.channels() == 3) cv::cvtColor(originImage, processedImage, cv::COLOR_BGR2GRAY);
         cv::equalizeHist(processedImage, processedImage);
         return processedImage;
     }
@@ -68,18 +68,18 @@ public:
         return processedImage;
     }
 
-    static cv::Mat applyCLAHEGray(const cv::Mat &originImage) {
-        cv::Mat processedImage;
-        cv::cvtColor(originImage, processedImage, cv::COLOR_BGR2GRAY);
+    static cv::Mat applyCLAHEGray(const cv::Mat &originImage, int clipLimit = 4) {
+        cv::Mat processedImage = originImage.clone();
+        if (originImage.channels() == 3) cv::cvtColor(originImage, processedImage, cv::COLOR_BGR2GRAY);
         cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
-        clahe->setClipLimit(4);
+        clahe->setClipLimit(clipLimit);
         clahe->apply(processedImage, processedImage);
         return processedImage;
     }
 
     static cv::Mat applyCLAHE(const cv::Mat &originImage) {
-        cv::Mat processedImage;
-        cv::cvtColor(originImage, processedImage, cv::COLOR_BGR2YUV);
+        cv::Mat processedImage = originImage.clone();
+        if (originImage.channels() == 3)  cv::cvtColor(originImage, processedImage, cv::COLOR_BGR2YUV);
         std::vector<cv::Mat> channels;
         cv::split(processedImage, channels);
 
@@ -189,6 +189,9 @@ public:
         switch (mat.type()) {
             case CV_8UC1:
                 img = QImage(mat.data, mat.cols, mat.rows, mat.step, QImage::Format_Grayscale8);
+                break;
+            case CV_16UC1:
+                img = QImage(mat.data, mat.cols, mat.rows, mat.step, QImage::Format_Grayscale16);
                 break;
             case CV_8UC3:
                 img = QImage(mat.data, mat.cols, mat.rows, mat.step, QImage::Format_RGB888);

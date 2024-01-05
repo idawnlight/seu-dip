@@ -21,6 +21,10 @@ public:
 
 public slots:
     void loadImage(const QString &imgPath, const QString& flag) const {
+        if (flag == "raw") {
+            return provider->loadRawImage(imgPath.toStdString());
+        }
+
         int cv_flag = cv::IMREAD_UNCHANGED;
         if (flag == "color") {
             cv_flag = cv::IMREAD_COLOR;
@@ -129,6 +133,14 @@ public slots:
 
     void cannyEdgeDetection() const {
         provider->cannyEdgeDetection();
+    }
+
+    void specialForLung() const {
+        provider->specialForLung();
+    }
+
+    void specialForKnee() const {
+        provider->specialForKnee();
     }
 };
 

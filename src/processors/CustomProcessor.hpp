@@ -20,7 +20,7 @@ public:
 
         // Calculate mapping
         int sum = 0;
-        int *mapping = new int[256];
+        const auto mapping = new int[256];
         for (int i = 0; i < 256; i++) {
             sum += histogram[i];
             mapping[i] = sum * 255 / (luma.rows * luma.cols);
@@ -32,6 +32,8 @@ public:
                 luma.at<uchar>(i, j) = mapping[luma.at<uchar>(i, j)];
             }
         }
+
+        delete[] mapping;
 
         return luma;
     }
@@ -50,11 +52,16 @@ public:
     }
 
     static cv::Mat CLAHE(const cv::Mat &originImage, int tilesX = 8, int tilesY = 8) {
-        cv::Mat processedImage;
-        cv::cvtColor(originImage, processedImage, cv::COLOR_BGR2YUV);
+        cv::Mat processedImage = originImage.clone();
+        cv::Mat luma;
         std::vector<cv::Mat> channels;
-        cv::split(processedImage, channels);
-        cv::Mat luma = channels[0];
+        if (originImage.channels() == 3) {
+            cv::cvtColor(originImage, processedImage, cv::COLOR_BGR2YUV);
+            cv::split(processedImage, channels);
+            luma = channels[0];
+        } else {
+            luma = processedImage;
+        }
 
         int mapping[tilesX * tilesY][256];
         cv::Size tileSize;
@@ -144,9 +151,14 @@ public:
             }
         }
 
-        channels[0] = padded(cv::Rect(0, 0, luma.cols, luma.rows));
-        cv::merge(channels, processedImage);
-        cv::cvtColor(processedImage, processedImage, cv::COLOR_YUV2BGR);
+        cv::Mat result = padded(cv::Rect(0, 0, luma.cols, luma.rows));
+        if (originImage.channels() == 3) {
+            channels[0] = padded(cv::Rect(0, 0, luma.cols, luma.rows));
+            cv::merge(channels, processedImage);
+            cv::cvtColor(processedImage, processedImage, cv::COLOR_YUV2BGR);
+        } else {
+            processedImage = result;
+        }
         return processedImage;
     }
 
@@ -321,9 +333,6 @@ public:
                 const int ax = x + 1;
                 const int ay = y + 1;
 
-//                int sum = padded.at<uchar>(ay - 1, ax) + padded.at<uchar>(ay + 1, ax) +
-//                          padded.at<uchar>(ay, ax - 1) + padded.at<uchar>(ay, ax + 1) -
-//                          4 * padded.at<uchar>(ay, ax);
                 int sum = padded.at<uchar>(ay - 1, ax - 1) + padded.at<uchar>(ay - 1, ax) + padded.at<uchar>(ay - 1, ax + 1) +
                           padded.at<uchar>(ay, ax - 1) + padded.at<uchar>(ay, ax + 1) + padded.at<uchar>(ay + 1, ax - 1) +
                           padded.at<uchar>(ay + 1, ax) + padded.at<uchar>(ay + 1, ax + 1) - 8 * padded.at<uchar>(ay, ax);

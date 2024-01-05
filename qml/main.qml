@@ -103,6 +103,14 @@ ApplicationWindow {
                 }
             }
             MenuItem {
+                text: "&Open (Raw)"
+
+                onTriggered: {
+                    fileDialog.flag = "raw";
+                    fileDialog.open();
+                }
+            }
+            MenuItem {
                 text: "Black Image"
 
                 onTriggered: {
@@ -353,6 +361,26 @@ ApplicationWindow {
 
                 onTriggered: {
                     AppState.cannyEdgeDetection();
+                    window.reload();
+                }
+            }
+        }
+        Menu {
+            title: "Special"
+
+            MenuItem {
+                text: "Lung"
+
+                onTriggered: {
+                    AppState.specialForLung();
+                    window.reload();
+                }
+            }
+            MenuItem {
+                text: "Knee"
+
+                onTriggered: {
+                    AppState.specialForKnee();
                     window.reload();
                 }
             }

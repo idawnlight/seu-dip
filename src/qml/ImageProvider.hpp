@@ -2,6 +2,7 @@
 #define SEU_DIP_IMAGEPROVIDER_HPP
 
 #include <QQuickImageProvider>
+#include <fstream>
 #include "../processors/OpenCVProcessor.hpp"
 #include "../processors/CustomProcessor.hpp"
 
@@ -46,6 +47,25 @@ public:
 
     void loadImage(const std::vector<uchar>& data, int flag = cv::IMREAD_COLOR) {
         originImage = cv::imdecode(data, flag);
+        processedImage = originImage.clone();
+    }
+
+    void loadRawImage(const std::string& path) {
+        std::ifstream file(path, std::ios::binary);
+        unsigned int width, height;
+        file.read(reinterpret_cast<char *>(&width), sizeof(width));
+        file.read(reinterpret_cast<char *>(&height), sizeof(height));
+        originImage = cv::Mat(height, width, CV_8UC1);
+
+        for (int i = 0; i < height; ++i) {
+            for (int j = 0; j < width; ++j) {
+                unsigned char data[2];
+                file.read(reinterpret_cast<char *>(data), sizeof(data));
+                const unsigned short raw = data[0] + (data[1] << 8);
+                originImage.at<uchar>(i, j) = raw / 16;
+//                originImage.at<unsigned short>(i, j) = data[0] + (data[1] << 8);
+            }
+        }
         processedImage = originImage.clone();
     }
 
@@ -150,6 +170,20 @@ public:
 
     void cannyEdgeDetection(double threshold1 = 100, double threshold2 = 200) {
         processedImage = OpenCVProcessor::cannyEdgeDetection(originImage, threshold1, threshold2);
+    }
+
+    void specialForLung() {
+        processedImage = CustomProcessor::CLAHE(originImage);
+        processedImage = CustomProcessor::CLAHE(processedImage);
+        processedImage = CustomProcessor::adaptiveMedianFilter(processedImage);
+    }
+
+    void specialForKnee() {
+        processedImage = CustomProcessor::CLAHE(originImage);
+        processedImage = CustomProcessor::CLAHE(processedImage);
+        processedImage = CustomProcessor::nonLocalMeanFilter(processedImage);
+        processedImage = CustomProcessor::CLAHE(processedImage);
+        processedImage = CustomProcessor::laplacianSharpening(processedImage);
     }
 
 private:
